@@ -9,3 +9,6 @@ Route::get('/', function () {
 
 // Route های RESTful برای Users
 Route::resource('users', UserController::class);
+
+Route::get('/users/{user}/posts', [UserController::class, 'showPosts'])->name('users.posts');
+Route::get('/users/{user}/comments', [UserController::class, 'showComments'])->name('users.comments');

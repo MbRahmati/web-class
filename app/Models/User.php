@@ -20,4 +20,20 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    /**
+     * ا یک کاربر می‌تواند چندین پست داشته باشد
+     */
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     *  یک کاربر می‌تواند چندین کامنت داشته باشد
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

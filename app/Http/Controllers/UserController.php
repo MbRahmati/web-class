@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Post;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -42,6 +44,17 @@ class UserController extends Controller
         return redirect()->route('users.index');
     }
 
+    public function showPosts(User $user)
+    {
+        $posts = $user->posts;
+        return view('users.posts', compact('user', 'posts'));
+    }
+
+    public function showComments(User $user)
+    {
+        $comments = $user->comments;
+        return view('users.comments', compact('user', 'comments'));
+    }
 
     public function show(User $user)
     {
