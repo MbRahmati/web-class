@@ -2,42 +2,89 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+
     public function index()
     {
-        return "Users Index: لیست کاربران";
+        $users = User::orderBy('id', 'desc')->get();
+
+        return view('users.index', [
+            'users' => $users,
+        ]);
     }
 
     public function create()
     {
-        return "Users Create: فرم ساخت کاربر";
+        return view('users.create');
     }
 
     public function store(Request $request)
     {
-        return "Users Store: ذخیره کاربر جدید";
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:150', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+        ]);
+
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return redirect()->route('users.index');
     }
 
-    public function show(string $user)
+
+    public function show(User $user)
     {
-        return "Users Show: نمایش کاربر با شناسه = " . $user;
+        return view('users.show', [
+            'user' => $user,
+        ]);
     }
 
-    public function edit(string $user)
+
+    public function edit(User $user)
     {
-        return "Users Edit: فرم ویرایش کاربر با شناسه = " . $user;
+        return view('users.edit', [
+            'user' => $user,
+        ]);
     }
 
-    public function update(Request $request, string $user)
+    public function update(Request $request, User $user)
     {
-        return "Users Update: آپدیت کاربر با شناسه = " . $user;
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:150', 'unique:users,email,' . $user->id],
+            'password' => ['nullable', 'string', 'min:6'],
+        ]);
+
+        $dataToUpdate = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ];
+
+        if (!empty($validated['password'])) {
+            $dataToUpdate['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($dataToUpdate);
+
+        return redirect()->route('users.index');
     }
 
-    public function destroy(string $user)
+
+    public function destroy(User $user)
     {
-        return "Users Destroy: حذف کاربر با شناسه = " . $user;
+        $user->delete();
+
+        return redirect()->route('users.index');
     }
 }
